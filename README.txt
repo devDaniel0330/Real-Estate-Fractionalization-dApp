@@ -1,3 +1,9 @@
+REMIX IDE LINK
+https://remix-project.org/?lang=en
+
+GITHUB LINK
+https://github.com/devDaniel0330/Real-Estate-Fractionalization-dApp
+
 REMIX DEFAULT WORKSPACE
 
 Remix default workspace is present when:
