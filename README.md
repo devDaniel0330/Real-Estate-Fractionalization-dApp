@@ -1,9 +1,72 @@
-REMIX IDE LINK
+# PROJECT STRUCTURE: (Note: for reference only, no need to strictly follow like this)
+
+real-estate-fractional-dapp/
+│
+├── README.md
+├── package.json
+├── contracts/                
+│   ├── PropertyToken.sol
+│   ├── Auth.sol
+│   └── ...
+│
+├── shared/                   
+│   ├── components/
+│   ├── utils/
+│   └── constants/
+│
+├── modules/
+│   ├── auth/                 
+│   │   ├── frontend/
+│   │   │   ├── Login.js
+│   │   │   ├── Register.js
+│   │   │   └── ...
+│   │   ├── backend/
+│   │   │   ├── auth.routes.js
+│   │   │   ├── auth.controller.js
+│   │   │   └── ...
+│   │   └── contract/         
+│   │       └── Auth.json
+│   │
+│   ├── buy-token/           
+│   │   ├── frontend/
+│   │   ├── backend/
+│   │   └── contract/
+│   │       └── BuyToken.json
+│   │
+│   ├── sell-token/          
+│   │   ├── frontend/
+│   │   ├── backend/
+│   │   └── contract/
+│   │       └── SellToken.json
+│   │
+│   ├── dividend-distribution/
+│   │   ├── frontend/
+│   │   ├── backend/
+│   │   └── contract/
+│   │
+│   ├── transaction-history/ 
+│   │   ├── frontend/
+│   │   │   ├── HistoryTable.js
+│   │   │   └── Filters.js
+│   │   ├── backend/
+│   │   │   ├── etherscanService.js
+│   │   │   └── transaction.controller.js
+│   │   └── contract/
+│   │
+│   └── dashboard/           
+│       ├── frontend/
+│       └── backend/
+│
+├── public/                   
+└── .env                      
+
+# REMIX IDE LINK:
 https://remix-project.org/?lang=en
 
-GITHUB LINK
+# GITHUB LINK:
 https://github.com/devDaniel0330/Real-Estate-Fractionalization-dApp
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 REMIX DEFAULT WORKSPACE
 
 Remix default workspace is present when:
