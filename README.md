@@ -33,9 +33,7 @@ Please note, require/import is supported in a limited manner for Remix supported
 For now, modules supported by Remix are ethers, web3, swarmgw, chai, multihashes, remix and hardhat only for hardhat.ethers object/plugin.
 For unsupported modules, an error like this will be thrown: '<module_name> module require is not supported by Remix IDE' will be shown.
 
-
-
-
+------------------------------------------------------------------------------------------------------------------------------------------------
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
