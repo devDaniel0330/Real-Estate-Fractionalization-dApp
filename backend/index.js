@@ -1,6 +1,8 @@
+const mysql = require('mysql2/promise');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = 5000;
@@ -8,45 +10,86 @@ const PORT = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-const users = [];
+let db;
+
+(async () => {
+  try {
+    db = await mysql.createConnection({
+      host: 'localhost',
+      user: 'root',
+      password: '',
+      database: 'real_estate_dapp',
+    });
+    console.log('MySQL connected');
+
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('MySQL connection error:', err);
+  }
+})();
 
 // register route
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { username, password, walletAddress, isAdmin } = req.body;
+  console.log('Register request body:', req.body); // Debug log
 
-  const user = {
-    username, 
-    password,
-    walletAddress,
-    isAdmin: !!isAdmin,
-  };
+  try {
+    // Check if user already exists
+    const [rows] = await db.execute(
+      'SELECT * FROM users WHERE walletAddress = ?',
+      [walletAddress]
+    );
+    if (rows.length > 0) {
+      return res.status(400).json({ message: 'Wallet already registered' });
+    }
 
-  users.push(user);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  console.log('registered: ', user);
-  res.status(200).json({ message: 'registration successful' });
+    await db.execute(
+      'INSERT INTO users (username, password, walletAddress, isAdmin) VALUES (?, ?, ?, ?)',
+      [username, hashedPassword, walletAddress, !!isAdmin]
+    );
+
+    res.status(200).json({ message: 'Registration successful' });
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ message: 'Error registering user' });
+  }
 });
 
 // login route
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { walletAddress, password, isAdmin } = req.body;
 
-  // Find user by wallet address
-  const user = users.find(u => 
-    u.walletAddress === walletAddress && u.isAdmin === !!isAdmin
-  );
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM users WHERE walletAddress = ? AND isAdmin = ?',
+      [walletAddress, !!isAdmin]
+    );
 
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+    const user = rows[0];
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Invalid password' });
+    }
+
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        username: user.username,
+        walletAddress: user.walletAddress,
+        isAdmin: user.isAdmin,
+      },
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Error logging in' });
   }
-
-  if (user.walletAddress !== walletAddress || user.password !== password) {
-    return res.status(401).json({ message: 'Invalid wallet address or password' });
-  }
-
-  res.json({ message: 'Login successful', user });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
 });
