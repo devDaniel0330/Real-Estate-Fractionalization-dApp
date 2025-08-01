@@ -7,6 +7,9 @@ https://github.com/devDaniel0330/Real-Estate-Fractionalization-dApp
 ## Github Commands
 https://github.com/joshnh/Git-Commands
 
+## How to Run
+make sure youre in client/ folder, then in console, run `npm start`
+
 ## Optimizing Gas (for Solidity)
 https://www.cyfrin.io/blog/solidity-gas-efficiency-tips-tackle-rising-fees-base-other-l2
 
