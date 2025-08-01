@@ -41,27 +41,10 @@ const Login = () => {
   return (
     <form onSubmit={handleLogin}>
       <h2>{form.isAdmin ? 'Admin Login' : 'User Login'}</h2>
-      <input
-        type="text"
-        name="address"
-        placeholder="Wallet Address"
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        onChange={handleChange}
-        required
-      />
+      <input type="text" name="address" placeholder="Wallet Address" onChange={handleChange} required />
+      <input type="password" name="password" placeholder="Password" onChange={handleChange} required/>
       <label>
-        <input
-          type="checkbox"
-          name="isAdmin"
-          checked={form.isAdmin}
-          onChange={handleChange}
-        />{' '}
+        <input type="checkbox" name="isAdmin" checked={form.isAdmin} onChange={handleChange} />{' '}
         Login as Admin
       </label>
       <button type="submit">Login</button>
