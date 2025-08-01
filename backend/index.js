@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 
 const users = [];
 
+// register route
 app.post('/api/register', (req, res) => {
   const { username, password, walletAddress, isAdmin } = req.body;
 
@@ -26,7 +27,7 @@ app.post('/api/register', (req, res) => {
   res.status(200).json({ message: 'registration successful' });
 });
 
-// Login route
+// login route
 app.post('/api/login', (req, res) => {
   const { walletAddress, password, isAdmin } = req.body;
 
@@ -39,8 +40,8 @@ app.post('/api/login', (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  if (user.password !== password) {
-    return res.status(401).json({ message: 'Invalid password' });
+  if (user.walletAddress !== walletAddress || user.password !== password) {
+    return res.status(401).json({ message: 'Invalid wallet address or password' });
   }
 
   res.json({ message: 'Login successful', user });
