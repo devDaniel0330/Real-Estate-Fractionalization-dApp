@@ -7,6 +7,7 @@ const AuthPage = () => {
 
   return (
     <div>
+      <h1>{isLogin ? 'Login Page' : 'Register Page'}</h1>
       {isLogin ? <Login /> : <Register />}
       <button onClick={() => setIsLogin(!isLogin)}>
         {isLogin ? 'Need an account? Register' : 'Already have an account? Login'}
