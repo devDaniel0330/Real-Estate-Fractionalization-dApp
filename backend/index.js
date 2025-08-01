@@ -8,22 +8,32 @@ const PORT = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-const users = []; // This should be shared with the register route
+const users = [];
 
 app.post('/api/register', (req, res) => {
-  const { username, password, walletAddress } = req.body;
-  users.push({ username, password, walletAddress });
+  const { username, password, walletAddress, isAdmin } = req.body;
 
-  console.log('received: ', username, password, walletAddress);
+  const user = {
+    username, 
+    password,
+    walletAddress,
+    isAdmin: !!isAdmin,
+  };
+
+  users.push(user);
+
+  console.log('registered: ', user);
   res.status(200).json({ message: 'registration successful' });
 });
 
 // Login route
 app.post('/api/login', (req, res) => {
-  const { walletAddress, password } = req.body;
+  const { walletAddress, password, isAdmin } = req.body;
 
   // Find user by wallet address
-  const user = users.find(u => u.walletAddress === walletAddress);
+  const user = users.find(u => 
+    u.walletAddress === walletAddress && u.isAdmin === !!isAdmin
+  );
 
   if (!user) {
     return res.status(404).json({ message: 'User not found' });
