@@ -93,3 +93,30 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ message: 'Error logging in' });
   }
 });
+
+// lists all available properties for normal users
+app.get('/api/properties', async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM properties WHERE is_available = TRUE'
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: 'error getting properties' });
+  }
+});
+
+// add new properties, admin only
+app.post('/api/properties', async (req, res) => {
+  const { title, description, price } = req.body;
+
+  try {
+    await db.execute(
+      'INSERT INTO properties (title, description, price) VALUES (?, ?, ?)', 
+      [title, description, price]
+    );
+    res.json({ message: 'property added successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'error adding property' });
+  }
+});
