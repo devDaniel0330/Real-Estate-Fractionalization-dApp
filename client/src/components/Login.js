@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -34,9 +34,8 @@ const Login = () => {
         // Store user info in localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
 
-        // Redirect based on admin status
         if (data.user.isAdmin === 1) {
-          navigate('/admin/dashboard');
+          navigate('/dashboard');
         } else {
           navigate('/dashboard');
         }
