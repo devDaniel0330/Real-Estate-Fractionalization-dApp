@@ -61,12 +61,12 @@ app.post('/api/register', async (req, res) => {
 
 // login route
 app.post('/api/login', async (req, res) => {
-  const { walletAddress, password, isAdmin } = req.body;
+  const { walletAddress, password } = req.body;
 
   try {
     const [rows] = await db.execute(
-      'SELECT * FROM users WHERE walletAddress = ? AND isAdmin = ?',
-      [walletAddress, !!isAdmin]
+      'SELECT * FROM users WHERE walletAddress = ?',
+      [walletAddress]
     );
 
     const user = rows[0];
@@ -76,7 +76,7 @@ app.post('/api/login', async (req, res) => {
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Invalid password' });
+      return res.status(401).json({ message: 'Invalid wallet address or password' });
     }
 
     res.json({
@@ -96,6 +96,7 @@ app.post('/api/login', async (req, res) => {
 
 // lists all available properties for normal users
 app.get('/api/properties', async (req, res) => {
+  // const { title, description, price, is_available, created_at } = req.body;
   try {
     const [rows] = await db.execute(
       'SELECT * FROM properties WHERE is_available = TRUE'
