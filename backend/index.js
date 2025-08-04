@@ -112,8 +112,8 @@ app.post('/api/properties', async (req, res) => {
 
   try {
     await db.execute(
-      'INSERT INTO properties (title, description, price) VALUES (?, ?, ?)', 
-      [title, description, price]
+      'INSERT INTO properties (title, description, price, is_available) VALUES (?, ?, ?, ?)', 
+      [title, description, price, true]
     );
     res.json({ message: 'property added successfully' });
   } catch (err) {
