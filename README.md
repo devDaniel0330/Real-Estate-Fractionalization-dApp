@@ -16,8 +16,8 @@ make sure youre in client/ folder, then in console, run `npm start`
 https://www.cyfrin.io/blog/solidity-gas-efficiency-tips-tackle-rising-fees-base-other-l2
 
 ### Sample Inputs
-Login
-  User:
+Login (if you have registered your own account, you can record it here)
+  User: 
     username: dan
     wallet address: 0x2a0E1a9123a283A03C82D4e65ac62119d9a06781
     password: dan123
