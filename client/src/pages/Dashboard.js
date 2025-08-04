@@ -9,12 +9,6 @@ const Dashboard = () => {
   const [showAddPropertyForm, setShowAddPropertyForm] = useState(false);
   const [properties, setProperties] = useState([]);
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem('user');
-
-  //   navigate('/auth'); // redirect to login
-  // }
-
   const fetchProperties = async () => {
     try {
       const res = await fetch('http://localhost:5000/api/properties');
