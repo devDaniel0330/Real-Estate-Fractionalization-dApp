@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
-import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import AddProperty from './components/AddProperty';
 
@@ -23,10 +22,10 @@ function App() {
         />
 
         <Route
-          path="/admin/dashboard"
+          path="/dashboard"
           element={
             <ProtectedRoute type="admin">
-              <AdminDashboard />
+              <Dashboard />
             </ProtectedRoute>
           }
         />
