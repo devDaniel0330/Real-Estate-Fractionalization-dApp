@@ -3,53 +3,71 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [form, setForm] = useState({
-    address: '',
-    password: '',
-    isAdmin: false,
-  });
-  const [message, setMessage] = useState('');
+  const [walletAddress, setWalletAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({
-      ...form,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:5000/api/login', {
-        walletAddress: form.address,
-        password: form.password,
-        isAdmin: form.isAdmin,
+      const res = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress, password }),
       });
 
-      const key = form.isAdmin ? 'admin' : 'user';
-      localStorage.setItem(key, JSON.stringify(res.data.user));
+      const data = await res.json();
 
-      navigate(form.isAdmin ? '/admin/dashboard' : '/dashboard');
-    } catch (err) {
-      setMessage('Login failed: ' + (err.response?.data?.message || err.message));
+      if (res.ok) {
+        if (isAdminLogin && data.user.isAdmin !== 1) {
+          alert('This is not an admin account.');
+          return;
+        }
+
+        if (!isAdminLogin && data.user.isAdmin === 1) {
+          alert('This is not a user account.');
+          return;
+        }
+        
+        // Store user info in localStorage
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Redirect based on admin status
+        if (data.user.isAdmin === 1) {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please try again.');
     }
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <h2>{form.isAdmin ? 'Admin Login' : 'User Login'}</h2>
-      <input type="text" name="address" placeholder="Wallet Address" onChange={handleChange} required />
-      <input type="password" name="password" placeholder="Password" onChange={handleChange} required/>
-      <label>
-        <input type="checkbox" name="isAdmin" checked={form.isAdmin} onChange={handleChange} />{' '}
+    <div>
+      <h2>{isAdminLogin ? 'Admin Login' : 'User Login'}</h2>
+
+      <label style={{ display: 'block', marginBottom: '10px' }}>
+        <input
+          type="checkbox"
+          checked={isAdminLogin}
+          onChange={() => setIsAdminLogin(!isAdminLogin)}
+        />{' '}
         Login as Admin
       </label>
-      <button type="submit">Login</button>
-      <p>{message}</p>
-    </form>
+
+      <form onSubmit={handleLogin}>
+        <input type="text" placeholder="Wallet Address" value={walletAddress} onChange={(e) => setWalletAddress(e.target.value)} />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <button type="submit">Login</button>
+      </form>
+    </div>
   );
 };
 
