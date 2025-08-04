@@ -16,11 +16,16 @@ make sure youre in client/ folder, then in console, run `npm start`
 https://www.cyfrin.io/blog/solidity-gas-efficiency-tips-tackle-rising-fees-base-other-l2
 
 ### Sample Inputs
-Login (user)
-  wallet address: 0x2a0E1a9123a283A03C82D4e65ac62119d9a06781
-  password: dan123
+Login
+  User:
+    username: dan
+    wallet address: 0x2a0E1a9123a283A03C82D4e65ac62119d9a06781
+    password: dan123
 
-
+  Admin:
+    username: Alia
+    wallet address: 0x3E9d29706c4E7EAc7f443E9Da74a3eBAb2ff465c
+    password: aliaAdmin123
 
 # Getting Started with Create React App
 
