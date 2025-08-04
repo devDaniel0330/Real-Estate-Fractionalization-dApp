@@ -96,7 +96,6 @@ app.post('/api/login', async (req, res) => {
 
 // lists all available properties for normal users
 app.get('/api/properties', async (req, res) => {
-  // const { title, description, price, is_available, created_at } = req.body;
   try {
     const [rows] = await db.execute(
       'SELECT * FROM properties WHERE is_available = TRUE'
