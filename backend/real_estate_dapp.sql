@@ -36,6 +36,18 @@ CREATE TABLE `properties` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `properties`
+--
+
+INSERT INTO `properties` (`id`, `title`, `description`, `price`, `is_available`, `created_at`) VALUES
+(1, 'Le Meridian', 'its a hotel', 100000.00, 1, '2025-08-04 01:46:57'),
+(2, 'Hotel B', 'this is another hotel', 150000.00, 1, '2025-08-04 02:08:40'),
+(3, 'Hotel B', 'this is a beautiful hotel', 200000.00, 1, '2025-08-04 08:41:50'),
+(4, 'Hotel C', 'this is hotel c', 300000.00, 1, '2025-08-04 08:45:13'),
+(5, 'Hotel D', 'this is hotel D', 350000.00, 1, '2025-08-04 08:48:57'),
+(6, 'Hotel E', 'another beautiful hotel', 250000.00, 1, '2025-08-04 09:00:46');
+
 -- --------------------------------------------------------
 
 --
@@ -55,7 +67,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `walletAddress`, `isAdmin`) VALUES
-(1, 'dan', '$2b$10$PkzKTavWKSyTMZ44SnyWoO3SKzuuBZgwPwjxl18jS4SjwQiZAww6O', '0x2a0E1a9123a283A03C82D4e65ac62119d9a06781', 0);
+(1, 'dan', '$2b$10$PkzKTavWKSyTMZ44SnyWoO3SKzuuBZgwPwjxl18jS4SjwQiZAww6O', '0x2a0E1a9123a283A03C82D4e65ac62119d9a06781', 0),
+(2, 'Alia', '$2b$10$ZhevMN67K7O1p6zQZWCy/uAegMD.8xBxpIjW2rpX35NlTW0TYrR1e', '0x3E9d29706c4E7EAc7f443E9Da74a3eBAb2ff465c', 1);
 
 --
 -- Indexes for dumped tables
