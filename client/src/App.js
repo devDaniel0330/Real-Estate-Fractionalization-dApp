@@ -4,6 +4,7 @@ import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import AddProperty from './components/AddProperty';
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
             <ProtectedRoute type="user">
               <Dashboard />
             </ProtectedRoute>
-          } />
+          }
+        />
 
         <Route
           path="/admin/dashboard"
@@ -26,7 +28,17 @@ function App() {
             <ProtectedRoute type="admin">
               <AdminDashboard />
             </ProtectedRoute>
-          } />
+          }
+        />
+
+        <Route
+          path="/admin/addProperty"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AddProperty />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
