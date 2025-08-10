@@ -94,12 +94,17 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// lists all available properties for normal users
+// lists all available properties with real time shares
 app.get('/api/properties', async (req, res) => {
   try {
-    const [rows] = await db.execute(
-      'SELECT * FROM properties WHERE is_available = TRUE'
-    );
+    const [rows] = await db.execute(`
+      SELECT 
+        id, title, description, price, price_per_share, total_shares, shares_sold,
+        (total_shares - shares_sold) AS available_shares,
+        contract_address, owner_wallet, image_url, is_available, created_at
+      FROM properties 
+      WHERE is_available = TRUE
+    `);
     res.json(rows);
   } catch (err) {
     res.status(500).json({ message: 'error getting properties' });
@@ -108,15 +113,46 @@ app.get('/api/properties', async (req, res) => {
 
 // add new properties, admin only
 app.post('/api/properties', async (req, res) => {
-  const { title, description, price } = req.body;
+  const { title, description, price_per_share, total_shares, contract_address, owner_wallet, image_url } = req.body;
+  const price = parseFloat(price_per_share) * parseInt(total_shares);
 
   try {
     await db.execute(
-      'INSERT INTO properties (title, description, price, is_available) VALUES (?, ?, ?, ?)', 
-      [title, description, price, true]
+      'INSERT INTO properties (title, description, price, price_per_share, total_shares, shares_sold, contract_address, owner_wallet, image_url, is_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+      [title, description, price, price_per_share, total_shares, 0, contract_address || null, owner_wallet || null, image_url || null, true]
     );
     res.json({ message: 'property added successfully' });
   } catch (err) {
     res.status(500).json({ message: 'error adding property' });
   }
+});
+
+// buy tokens
+app.post('/api/buy', async (req, res) => {
+  const { userId, propertyId, sharesToBuy } = req.body;
+
+  // Fetch property info
+  const [property] = await db.query("SELECT * FROM properties WHERE id = ?", [propertyId]);
+  if (!property) return res.status(404).send("Property not found");
+
+  const remainingShares = property.total_shares - property.shares_sold;
+  if (sharesToBuy > remainingShares) {
+    return res.status(400).send("Not enough shares available");
+  }
+
+  const totalPrice = sharesToBuy * property.price_per_share;
+
+  // Insert purchase record
+  await db.query(
+    "INSERT INTO purchases (user_id, property_id, shares_bought, total_price) VALUES (?, ?, ?, ?)",
+    [userId, propertyId, sharesToBuy, totalPrice]
+  );
+
+  // Update shares sold
+  await db.query(
+    "UPDATE properties SET shares_sold = shares_sold + ? WHERE id = ?",
+    [sharesToBuy, propertyId]
+  );
+
+  res.send("Purchase successful");
 });
