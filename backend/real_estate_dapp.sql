@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 03, 2025 at 03:36 PM
+-- Generation Time: Aug 09, 2025 at 04:52 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,6 +32,12 @@ CREATE TABLE `properties` (
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
+  `price_per_share` decimal(10,2) NOT NULL,
+  `total_shares` int(11) NOT NULL,
+  `shares_sold` int(11) DEFAULT 0,
+  `contract_address` varchar(66) DEFAULT NULL,
+  `owner_wallet` varchar(66) DEFAULT NULL,
+  `image_url` varchar(255) DEFAULT NULL,
   `is_available` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -40,13 +46,9 @@ CREATE TABLE `properties` (
 -- Dumping data for table `properties`
 --
 
-INSERT INTO `properties` (`id`, `title`, `description`, `price`, `is_available`, `created_at`) VALUES
-(1, 'Le Meridian', 'its a hotel', 100000.00, 1, '2025-08-04 01:46:57'),
-(2, 'Hotel B', 'this is another hotel', 150000.00, 1, '2025-08-04 02:08:40'),
-(3, 'Hotel B', 'this is a beautiful hotel', 200000.00, 1, '2025-08-04 08:41:50'),
-(4, 'Hotel C', 'this is hotel c', 300000.00, 1, '2025-08-04 08:45:13'),
-(5, 'Hotel D', 'this is hotel D', 350000.00, 1, '2025-08-04 08:48:57'),
-(6, 'Hotel E', 'another beautiful hotel', 250000.00, 1, '2025-08-04 09:00:46');
+INSERT INTO `properties` (`id`, `title`, `description`, `price`, `price_per_share`, `total_shares`, `shares_sold`, `contract_address`, `owner_wallet`, `image_url`, `is_available`, `created_at`) VALUES
+(1, 'hotel A', 'this is hotel A', 250000.00, 250.00, 1000, 0, '0xB34db0d5aA577998c10c80d76F87AfE58b024e5F', NULL, NULL, 1, '2025-08-05 15:42:46'),
+(2, 'hotel B', 'this is hotel B', 2000000.00, 1000.00, 2000, 0, NULL, NULL, NULL, 1, '2025-08-09 14:46:07');
 
 -- --------------------------------------------------------
 
@@ -95,13 +97,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `properties`
 --
 ALTER TABLE `properties`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

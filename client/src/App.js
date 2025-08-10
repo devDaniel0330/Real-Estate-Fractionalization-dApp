@@ -4,6 +4,7 @@ import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import AddProperty from './components/AddProperty';
+import BuyTokens from './components/BuyTokens';
 
 function App() {
   return (
@@ -38,6 +39,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/buy/:id" element={<BuyTokens />} />
       </Routes>
     </Router>
   );
