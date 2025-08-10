@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import AddProperty from './components/AddProperty';
-import BuyTokens from './components/BuyTokens';
+import AddProperty from './components/AddProperty/AddProperty';
+import BuyTokens from './components/BuyTokens/BuyTokens';
 
 function App() {
   return (

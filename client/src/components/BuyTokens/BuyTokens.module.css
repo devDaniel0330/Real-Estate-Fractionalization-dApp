@@ -1,0 +1,70 @@
+.buyTokens {
+  background-color: #ffffff;
+  padding: 20px 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 400px;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+}
+
+.buyTokens h2 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #444;
+}
+
+.form input {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s ease-in-out;
+}
+
+.form input:focus {
+  border-color: #007bff;
+}
+
+.button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 0;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.status {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.status:empty {
+  display: none;
+}
+
+.status:before {
+  content: "";
+}
