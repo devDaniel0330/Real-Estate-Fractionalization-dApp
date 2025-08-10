@@ -10,7 +10,7 @@ https://github.com/devDaniel0330/Real-Estate-Fractionalization-dApp
 https://github.com/joshnh/Git-Commands
 
 ## How to Run
-- open XAMPP, run MySQL and click Admin, will open the browser and bring you to phpmyadmin, then import real_estate_dapp.sql 
+- open XAMPP, run Apache and MySQL, then click Admin beside MySQL, it will open the browser and bring you to phpmyadmin, then import real_estate_dapp.sql 
 - make sure youre in backend/ folder and your XAMPP is running, then in console, run `nodemon`
 - make sure youre in client/ folder, then in another console, run `npm start`
 
