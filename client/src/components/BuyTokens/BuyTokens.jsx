@@ -4,6 +4,9 @@ import PropertyToken from '../../abi/PropertyToken.json';
 import styles from './BuyTokens.module.css';
 
 const BuyTokens = () => {
+  const [web3, setWeb3] = useState(null);
+  const [factory, setFactory] = useState(null);
+  const [account, setAccount] = useState('');
   const [amount, setAmount] = useState('');
   const [status, setStatus] = useState('');
 
@@ -13,6 +16,28 @@ const BuyTokens = () => {
     e.preventDefault(); // prevent form from refreshing the page
     await handleBuy();
   };
+  
+  useEffect(() => {
+    const initWeb3 = async () => {
+      if (window.ethereum) {
+        const web3Instance = new Web3(window.ethereum);
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await web3Instance.eth.getAccounts();
+        
+        setWeb3(web3Instance);
+        setAccount(accounts[0]);
+        
+        // Connect to factory contract
+        const factoryInstance = new web3Instance.eth.Contract(
+          PropertyTokenFactory.abi,
+          PropertyTokenFactory.networks[5777].address // Ganache network ID
+        );
+        setFactory(factoryInstance);
+      }
+    };
+    
+    initWeb3();
+  }, []);
   
   const handleBuy = async () => {
     if (!amount || isNaN(amount) || parseInt(amount) <= 0) {

@@ -3,12 +3,24 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const Web3 = require('web3');
+const PropertyTokenFactory = require('../client/src/contracts/PropertyTokenFactory.json');
 
 const app = express();
 const PORT = 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// initialize Web3
+const web3 = new Web3('http://localhost:7545'); // ganache
+
+// Get contract instance
+const factoryAddress = PropertyTokenFactory.networks[5777].address;
+const factory = new web3.eth.Contract(
+  PropertyTokenFactory.abi, 
+  factoryAddress
+);
 
 let db;
 
@@ -112,18 +124,56 @@ app.get('/api/properties', async (req, res) => {
 });
 
 // add new properties, admin only
-app.post('/api/properties', async (req, res) => {
-  const { title, description, price_per_share, total_shares, contract_address, owner_wallet, image_url } = req.body;
-  const price = parseFloat(price_per_share) * parseInt(total_shares);
+// app.post('/api/properties', async (req, res) => {
+//   const { title, description, price_per_share, total_shares, contract_address, owner_wallet, image_url } = req.body;
+//   const price = parseFloat(price_per_share) * parseInt(total_shares);
 
+//   try {
+//     await db.execute(
+//       'INSERT INTO properties (title, description, price, price_per_share, total_shares, shares_sold, contract_address, owner_wallet, image_url, is_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+//       [title, description, price, price_per_share, total_shares, 0, contract_address || null, owner_wallet || null, image_url || null, true]
+//     );
+//     res.json({ message: 'property added successfully' });
+//   } catch (err) {
+//     res.status(500).json({ message: 'error adding property' });
+//   }
+// });
+
+// Update add property endpoint to deploy smart contract
+app.post('/api/properties', async (req, res) => {
+  const { title, description, price_per_share, total_shares, owner_wallet } = req.body;
+  
   try {
+    // Deploy new property token via factory
+    const receipt = await factory.methods.createPropertyToken(
+      title,
+      title.substring(0,3).toUpperCase(), // symbol
+      title,
+      description,
+      web3.utils.toWei(price_per_share.toString(), 'ether'),
+      total_shares,
+      web3.utils.toWei(price_per_share.toString(), 'ether'),
+      "QmDummyHash" // IPFS hash
+    ).send({ 
+      from: owner_wallet,
+      gas: 5000000 
+    });
+    
+    const propertyAddress = receipt.events.PropertyTokenDeployed.returnValues.tokenContract;
+    
+    // Save to database with contract address
     await db.execute(
-      'INSERT INTO properties (title, description, price, price_per_share, total_shares, shares_sold, contract_address, owner_wallet, image_url, is_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-      [title, description, price, price_per_share, total_shares, 0, contract_address || null, owner_wallet || null, image_url || null, true]
+      'INSERT INTO properties (title, description, price, price_per_share, total_shares, shares_sold, contract_address, owner_wallet, is_available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+      [title, description, price, price_per_share, total_shares, 0, propertyAddress, owner_wallet, true]
     );
-    res.json({ message: 'property added successfully' });
+    
+    res.json({ 
+      message: 'Property and smart contract created successfully',
+      contractAddress: propertyAddress
+    });
   } catch (err) {
-    res.status(500).json({ message: 'error adding property' });
+    console.error('Error:', err);
+    res.status(500).json({ message: 'Error creating property' });
   }
 });
 
