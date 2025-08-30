@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AddProperty from '../components/AddProperty';
-import PropertyList from '../components/PropertyList';
+import AddProperty from '../components/AddProperty/AddProperty';
+import PropertyList from '../components/PropertyList/PropertyList';
 
 const Dashboard = () => {
   const navigate = useNavigate();

@@ -1,0 +1,72 @@
+.addProperty {
+  background-color: #ffffff;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.addProperty h2 {
+  font-size: 1.6rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #444;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #fdfdfd;
+  transition: border 0.3s ease;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.button {
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  text-align: center;
+}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-// import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import styles from './Login.module.css';
 
 const Login = () => {
   const [walletAddress, setWalletAddress] = useState('');
@@ -49,10 +49,10 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>{isAdminLogin ? 'Admin Login' : 'User Login'}</h2>
+    <div className={styles.container}>
+      <h2 className={styles.heading}>{isAdminLogin ? 'Admin Login' : 'User Login'}</h2>
 
-      <label style={{ display: 'block', marginBottom: '10px' }}>
+      <label className={styles.checkboxLabel}>
         <input
           type="checkbox"
           checked={isAdminLogin}
@@ -61,10 +61,10 @@ const Login = () => {
         Login as Admin
       </label>
 
-      <form onSubmit={handleLogin}>
-        <input type="text" placeholder="Wallet Address" value={walletAddress} onChange={(e) => setWalletAddress(e.target.value)} />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <button type="submit">Login</button>
+      <form onSubmit={handleLogin} className={styles.form}>
+        <input type="text" placeholder="Wallet Address" value={walletAddress} onChange={(e) => setWalletAddress(e.target.value)} className={styles.input} />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className={styles.input} />
+        <button type="submit" className={styles.button}>Login</button>
       </form>
     </div>
   );

@@ -1,4 +1,17 @@
 
+TODO stuff:
+
+- go to client/src/components
+- each folder in the components folder is a module
+- each person is responsible of their respective modules
+
+
+
+
+
+
+
+
 
 ## Remix IDE Link
 https://remix-project.org/?lang=en
@@ -18,16 +31,16 @@ https://github.com/joshnh/Git-Commands
 https://www.cyfrin.io/blog/solidity-gas-efficiency-tips-tackle-rising-fees-base-other-l2
 
 ### Sample Inputs
-Login (if you have registered your own account, you can record it here)
-  User: 
-    username: dan
-    wallet address: 0x2a0E1a9123a283A03C82D4e65ac62119d9a06781
-    password: dan123
+Login (if you have registered your own account, you can record it here) <br>
+  User: <br>
+    username: dan <br>
+    wallet address: 0x2a0E1a9123a283A03C82D4e65ac62119d9a06781 <br>
+    password: dan123 <br>
 
-  Admin:
-    username: Alia
-    wallet address: 0x3E9d29706c4E7EAc7f443E9Da74a3eBAb2ff465c
-    password: aliaAdmin123
+  Admin: <br>
+    username: Alia <br>
+    wallet address: 0x3E9d29706c4E7EAc7f443E9Da74a3eBAb2ff465c <br>
+    password: aliaAdmin123 <br>
 
 # Getting Started with Create React App
 
