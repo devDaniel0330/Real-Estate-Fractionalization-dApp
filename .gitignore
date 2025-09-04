@@ -1,1 +1,4 @@
 node_modules
+.wake/extension/shared.json
+.gitignore
+.wake/extension/local-local-chain-976e1fa4-0fc5-4327-9d83-7830d63df532.json
