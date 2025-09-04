@@ -5,14 +5,6 @@ TODO stuff:
 - each folder in the components folder is a module
 - each person is responsible of their respective modules
 
-
-
-
-
-
-
-
-
 ## Remix IDE Link
 https://remix-project.org/?lang=en
 
