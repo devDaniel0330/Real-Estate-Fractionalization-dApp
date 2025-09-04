@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import PropertyToken from '../../abi/PropertyToken.json';
+import PropertyToken from '../../contracts/PropertyToken.json';
+import PropertyTokenFactory from '../../contracts/PropertyTokenFactory.json';
 import styles from './BuyTokens.module.css';
 
 const BuyTokens = () => {
@@ -10,35 +11,37 @@ const BuyTokens = () => {
   const [amount, setAmount] = useState('');
   const [status, setStatus] = useState('');
 
-  const contractAddress = "0x8059B0AE35c113137694Ba15b2C3585aE77Bb8E9";
+  const contractAddress = "0x7874d94b8f9E2a28FCceCE404666C984f33a82b8";
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // prevent form from refreshing the page
-    await handleBuy();
-  };
-  
   useEffect(() => {
     const initWeb3 = async () => {
       if (window.ethereum) {
         const web3Instance = new Web3(window.ethereum);
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const accounts = await web3Instance.eth.getAccounts();
-        
+
         setWeb3(web3Instance);
         setAccount(accounts[0]);
-        
-        // Connect to factory contract
-        const factoryInstance = new web3Instance.eth.Contract(
-          PropertyTokenFactory.abi,
-          PropertyTokenFactory.networks[5777].address // Ganache network ID
-        );
-        setFactory(factoryInstance);
+
+        // Connect to factory contract if it exists
+        if (PropertyTokenFactory.networks && PropertyTokenFactory.networks[5777]) {
+          const factoryInstance = new web3Instance.eth.Contract(
+            PropertyTokenFactory.abi,
+            PropertyTokenFactory.networks[5777].address
+          );
+          setFactory(factoryInstance);
+        }
       }
     };
-    
+
     initWeb3();
   }, []);
-  
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // prevent form from refreshing the page
+    await handleBuy();
+  };
+
   const handleBuy = async () => {
     if (!amount || isNaN(amount) || parseInt(amount) <= 0) {
       setStatus('Please enter a valid token amount');
@@ -73,6 +76,56 @@ const BuyTokens = () => {
       setStatus(`Error: ${err.message}`);
     }
   };
+
+  // Add this function to your BuyTokens component to debug
+  const debugContract = async () => {
+    try {
+      const web3 = new Web3(window.ethereum);
+      const accounts = await web3.eth.getAccounts();
+
+      const contract = new web3.eth.Contract(
+        PropertyToken.abi,
+        contractAddress
+      );
+
+      console.log('Contract ABI methods:', contract.methods);
+
+      // Test if functions exist
+      if (contract.methods.pricePerToken) {
+        console.log('pricePerToken function exists');
+      } else {
+        console.log('pricePerToken function NOT found');
+      }
+
+      if (contract.methods.buyTokens) {
+        console.log('buyTokens function exists');
+      } else {
+        console.log('buyTokens function NOT found');
+      }
+
+      // Test calling pricePerToken
+      try {
+        const price = await contract.methods.pricePerToken().call();
+        console.log('Price per token:', price);
+      } catch (error) {
+        console.log('Error calling pricePerToken:', error.message);
+      }
+
+      // Test calling getAvailableTokens
+      try {
+        const available = await contract.methods.getAvailableTokens().call();
+        console.log('Available tokens:', available);
+      } catch (error) {
+        console.log('Error calling getAvailableTokens:', error.message);
+      }
+
+    } catch (error) {
+      console.log('Debug error:', error);
+    }
+  };
+
+  // Add this button to your JSX temporarily
+  <button onClick={debugContract}>Debug Contract</button>
 
   return (
     <div className={styles.buyTokens}>
