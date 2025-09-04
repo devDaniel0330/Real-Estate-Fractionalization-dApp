@@ -7,43 +7,43 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
  * @title PropertyToken
- * @dev ERC-20 token representing fractional ownership of real estate property
- * Each token represents one unit of ownership in the property
+ * @dev Complete ERC-20 token for real estate fractionalization with marketplace
  */
-
 contract PropertyToken is ERC20, Ownable, ReentrancyGuard {
+    
     struct PropertyInfo {
         string title;
         string description;
-        uint256 valuation;
-        uint256 pricePerToken;
-        string ipfsHash;
-        bool isVerified;
-        uint256 createdAt;
+        uint256 valuation;        // Total property value in wei
+        uint256 pricePerToken;    // Price per token in wei
+        string ipfsHash;          // IPFS hash for documents
+        bool isVerified;          // KYC/legal verification
+        uint256 createdAt;        // Creation timestamp
     }
-
+    
     PropertyInfo public propertyInfo;
     address public propertyOwner;
     bool public tokensIssued;
-
-    // events
+    
+    // Marketplace variables
+    mapping(address => uint256) public tokensForSale;
+    mapping(address => uint256) public salePrice;
+    mapping(address => bool) public isListed;
+    
+    // Income distribution
+    uint256 public totalIncomeDeposited;
+    mapping(address => uint256) public lastClaimBlock;
+    mapping(address => uint256) public claimedIncome;
+    
+    // Events
     event PropertyCreated(address indexed owner, string title, uint256 valuation, uint256 totalSupply, uint256 pricePerToken);
     event TokensMinted(address indexed to, uint256 amount, uint256 timestamp);
-    event PropertyVerified(address indexed verifier, bool isVerified, uint256 timestamp);
-
-    /**
-     * @dev Constructor to create a new property token
-     * @param _name Token name (e.g., "Downtown Apartment Tokens")
-     * @param _symbol Token symbol (e.g., "DAT")
-     * @param _title Property title
-     * @param _description Property description
-     * @param _valuation Total property valuation in wei
-     * @param _totalSupply Total number of tokens to be issued
-     * @param _pricePerToken Price per token in wei
-     * @param _ipfsHash IPFS hash containing property documents
-     * @param _propertyOwner Address of the property owner
-     */
-
+    event PropertyVerified(address indexed verifier, bool status, uint256 timestamp);
+    event TokensPurchased(address indexed buyer, address indexed seller, uint256 amount, uint256 totalPrice);
+    event TokensListed(address indexed seller, uint256 amount, uint256 pricePerToken);
+    event IncomeDeposited(address indexed owner, uint256 amount, uint256 timestamp);
+    event IncomeClaimed(address indexed investor, uint256 amount, uint256 timestamp);
+    
     constructor(
         string memory _name,
         string memory _symbol,
@@ -60,8 +60,7 @@ contract PropertyToken is ERC20, Ownable, ReentrancyGuard {
         require(_totalSupply > 0, "Total supply must be greater than 0");
         require(_pricePerToken > 0, "Price per token must be greater than 0");
         require(bytes(_title).length > 0, "Property title cannot be empty");
-
-        // set property information
+        
         propertyInfo = PropertyInfo({
             title: _title,
             description: _description,
@@ -71,129 +70,189 @@ contract PropertyToken is ERC20, Ownable, ReentrancyGuard {
             isVerified: false,
             createdAt: block.timestamp
         });
-
+        
         propertyOwner = _propertyOwner;
         tokensIssued = false;
         
-        // Transfer ownership to property owner
-        _transferOwnership(_propertyOwner);
-        
-        emit PropertyCreated(_propertyOwner,_title,_valuation,_totalSupply,_pricePerToken);
+        emit PropertyCreated(_propertyOwner, _title, _valuation, _totalSupply, _pricePerToken);
     }
-
-    /**
-     * @dev Creates property tokens - deploys ERC-20 contract with metadata
-     * This function is called during contract deployment
-     * @return success Boolean indicating successful creation
-     */
+    
+    // ========== DANIEL'S MODULE: Property Fractionalization & Token Issuance ==========
+    
     function createProperty() external view returns (bool success) {
-        // Property is created during contract deployment
-        // This function exists for interface compatibility
         require(bytes(propertyInfo.title).length > 0, "Property not initialized");
         return true;
     }
-
-    /**
-     * @dev Mints the full supply of tokens to the property owner's wallet
-     * Can only be called once by the property owner
-     */
+    
     function mintTokens() external onlyOwner nonReentrant {
         require(!tokensIssued, "Tokens already minted");
         require(propertyInfo.isVerified, "Property must be verified before minting");
         
         uint256 totalTokens = propertyInfo.valuation / propertyInfo.pricePerToken;
-        
         _mint(propertyOwner, totalTokens);
         tokensIssued = true;
         
         emit TokensMinted(propertyOwner, totalTokens, block.timestamp);
     }
-
-    /**
-     * @dev Verifies property ownership (simulated on-chain for demo)
-     * In production, this would involve off-chain KYC/legal document verification
-     * @param _verified Verification status
-     */
+    
     function verifyPropertyOwnership(bool _verified) external onlyOwner {
         propertyInfo.isVerified = _verified;
         emit PropertyVerified(msg.sender, _verified, block.timestamp);
     }
-
-    /**
-     * @dev Alternative verification function for external verifiers
-     * @param _verified Verification status
-     */
-    function setVerificationStatus(bool _verified) external {
-        // In a real implementation, this would check if msg.sender is an authorized verifier
-        // For demo purposes, we'll allow the owner to verify
-        require(msg.sender == propertyOwner, "Only property owner can verify");
-        propertyInfo.isVerified = _verified;
-        emit PropertyVerified(msg.sender, _verified, block.timestamp);
+    
+    // ========== WONG SHEN HUI'S MODULE: Market Listing & Distribution ==========
+    
+    function listTokensForSale(uint256 _amount, uint256 _pricePerToken) external {
+        require(tokensIssued, "Tokens not yet issued");
+        require(balanceOf(msg.sender) >= _amount, "Insufficient token balance");
+        require(_amount > 0, "Amount must be greater than 0");
+        require(_pricePerToken > 0, "Price must be greater than 0");
+        
+        tokensForSale[msg.sender] = _amount;
+        salePrice[msg.sender] = _pricePerToken;
+        isListed[msg.sender] = true;
+        
+        emit TokensListed(msg.sender, _amount, _pricePerToken);
     }
     
-    /**
-     * @dev Gets property information
-     * @return PropertyInfo struct containing all property details
-     */
+    function purchaseTokens(address _seller, uint256 _amount) external payable nonReentrant {
+        if (_seller == propertyOwner) {
+            // Buy from property owner at initial price
+            _buyFromOwner(_amount);
+        } else {
+            // Buy from secondary market
+            _buyFromInvestor(_seller, _amount);
+        }
+    }
+    
+    function _buyFromOwner(uint256 _amount) internal {
+        require(tokensIssued, "Tokens not yet issued");
+        require(_amount > 0, "Amount must be greater than 0");
+        require(balanceOf(propertyOwner) >= _amount, "Not enough tokens available");
+        
+        uint256 totalPrice = propertyInfo.pricePerToken * _amount;
+        require(msg.value >= totalPrice, "Insufficient payment");
+        
+        _transfer(propertyOwner, msg.sender, _amount);
+        payable(propertyOwner).transfer(totalPrice);
+        
+        if (msg.value > totalPrice) {
+            payable(msg.sender).transfer(msg.value - totalPrice);
+        }
+        
+        emit TokensPurchased(msg.sender, propertyOwner, _amount, totalPrice);
+    }
+    
+    function _buyFromInvestor(address _seller, uint256 _amount) internal {
+        require(tokensIssued, "Tokens not yet issued");
+        require(isListed[_seller], "Seller not listing tokens");
+        require(tokensForSale[_seller] >= _amount, "Not enough tokens listed");
+        require(_amount > 0, "Amount must be greater than 0");
+        
+        uint256 totalPrice = salePrice[_seller] * _amount;
+        require(msg.value >= totalPrice, "Insufficient payment");
+        
+        tokensForSale[_seller] -= _amount;
+        if (tokensForSale[_seller] == 0) {
+            isListed[_seller] = false;
+        }
+        
+        _transfer(_seller, msg.sender, _amount);
+        payable(_seller).transfer(totalPrice);
+        
+        if (msg.value > totalPrice) {
+            payable(msg.sender).transfer(msg.value - totalPrice);
+        }
+        
+        emit TokensPurchased(msg.sender, _seller, _amount, totalPrice);
+    }
+    
+    function getAvailableTokens() external view returns (uint256) {
+        return balanceOf(propertyOwner);
+    }
+    
+    // ========== ALIA'S MODULE: Transactions, Trading & Records ==========
+    
+    function transferTokens(address _to, uint256 _amount) external returns (bool) {
+        require(tokensIssued, "Tokens not yet issued");
+        return transfer(_to, _amount);
+    }
+    
+    function checkBalance(address _investor) external view returns (uint256) {
+        return balanceOf(_investor);
+    }
+    
+    // Transaction history is handled by events - frontend can query Transfer events
+    function getTransactionHistory(address _investor) external view returns (string memory) {
+        // In a real implementation, this would return structured data
+        // For now, return a message directing to events
+        return "Check Transfer, TokensPurchased events for transaction history";
+    }
+    
+    // ========== INCOME DISTRIBUTION MODULE ==========
+    
+    function depositIncome() external payable onlyOwner {
+        require(msg.value > 0, "Must send income to distribute");
+        totalIncomeDeposited += msg.value;
+        emit IncomeDeposited(msg.sender, msg.value, block.timestamp);
+    }
+    
+    function calculateShare(address _investor) external view returns (uint256) {
+        if (totalSupply() == 0) return 0;
+        uint256 investorBalance = balanceOf(_investor);
+        uint256 totalIncome = address(this).balance;
+        return (totalIncome * investorBalance) / totalSupply();
+    }
+    
+    function claimIncome() external nonReentrant {
+        require(balanceOf(msg.sender) > 0, "No tokens owned");
+        
+        uint256 claimableAmount = this.calculateShare(msg.sender);
+        uint256 alreadyClaimed = claimedIncome[msg.sender];
+        uint256 newClaim = claimableAmount - alreadyClaimed;
+        
+        require(newClaim > 0, "No income to claim");
+        require(address(this).balance >= newClaim, "Insufficient contract balance");
+        
+        claimedIncome[msg.sender] = claimableAmount;
+        payable(msg.sender).transfer(newClaim);
+        
+        emit IncomeClaimed(msg.sender, newClaim, block.timestamp);
+    }
+    
+    function getIncomeHistory(address _investor) external view returns (uint256 claimed, uint256 available) {
+        claimed = claimedIncome[_investor];
+        available = this.calculateShare(_investor) - claimed;
+    }
+    
+    // ========== VIEW FUNCTIONS ==========
+    
+    function pricePerToken() external view returns (uint256) {
+        return propertyInfo.pricePerToken;
+    }
+    
     function getPropertyInfo() external view returns (PropertyInfo memory) {
         return propertyInfo;
     }
-
-    /**
-     * @dev Gets the total supply of tokens for this property
-     * @return uint256 Total number of tokens
-     */
-    function getTotalTokenSupply() external view returns (uint256) {
-        return totalSupply();
+    
+    function getListedTokens(address _seller) external view returns (uint256 amount, uint256 price) {
+        return (tokensForSale[_seller], salePrice[_seller]);
     }
-
-    /**
-     * @dev Checks if tokens have been issued
-     * @return bool Whether tokens have been minted
-     */
+    
     function areTokensIssued() external view returns (bool) {
         return tokensIssued;
     }
     
-    /**
-     * @dev Gets the property owner address
-     * @return address Property owner's address
-     */
     function getPropertyOwner() external view returns (address) {
         return propertyOwner;
     }
-
-    /**
-     * @dev Updates IPFS hash for property documents
-     * @param _newIpfsHash New IPFS hash
-     */
-    function updatePropertyDocuments(string memory _newIpfsHash) external onlyOwner {
-        require(bytes(_newIpfsHash).length > 0, "IPFS hash cannot be empty");
-        propertyInfo.ipfsHash = _newIpfsHash;
-    }
     
-    /**
-     * @dev Updates property price per token
-     * @param _newPricePerToken New price per token in wei
-     */
-    function updatePricePerToken(uint256 _newPricePerToken) external onlyOwner {
-        require(_newPricePerToken > 0, "Price must be greater than 0");
-        require(!tokensIssued, "Cannot update price after tokens are minted");
-        propertyInfo.pricePerToken = _newPricePerToken;
-    }
-
-    /**
-     * @dev Override transfer function to add any additional logic if needed
-     * Currently allows standard ERC-20 transfers
-     */
+    // Override transfer to ensure tokens are issued
     function transfer(address to, uint256 amount) public virtual override returns (bool) {
         require(tokensIssued, "Tokens not yet issued");
         return super.transfer(to, amount);
     }
     
-    /**
-     * @dev Override transferFrom function to add any additional logic if needed
-     */
     function transferFrom(address from, address to, uint256 amount) public virtual override returns (bool) {
         require(tokensIssued, "Tokens not yet issued");
         return super.transferFrom(from, to, amount);
